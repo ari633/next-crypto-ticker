@@ -10,6 +10,7 @@ import { Chart } from "react-google-charts";
 export default function Page({ params }) {
   const symbol = params.slug;
   const [ticker, setTicker] = useState([]);
+  const [dataChart, setDataChart] = useState([["Day", "", "", "", ""]]);
   const { subscribe, messageHistory } = useContext(SocketContext);
 
   const { data, isLoading } = useQuery({
@@ -24,7 +25,7 @@ export default function Page({ params }) {
     queryKey: [`line_${symbol}`],
     queryFn: () =>
       fetch(
-        `https://testnet.binance.vision/api/v3/uiKlines?symbol=${symbol}&interval=5m`
+        `https://testnet.binance.vision/api/v3/uiKlines?symbol=${symbol}&interval=5m&limit=10`
       ).then((res) => res.json()),
   });
 
@@ -69,17 +70,26 @@ export default function Page({ params }) {
   }, [data]);
 
   useEffect(() => {
-    console.log(lineData);
+    if (lineData) {
+      const l = lineData.map((item) => [new Date(item[0]).toTimeString(), Number(item[3]), Number(item[1]), Number(item[4]), Number(item[2])]);
+      setDataChart((prev) => [...prev, ...l]);
+    }
   }, [lineData]);
 
-  const dataChart = [
-    ["Day", "", "", "", ""],
-    ["Mon", 20, 28, 38, 45],
-    ["Tue", 31, 38, 55, 66],
-    ["Wed", 50, 55, 77, 80],
-    ["Thu", 77, 77, 66, 50],
-    ["Fri", 68, 66, 22, 15],
-  ];
+  /**
+   * 1 lower price
+   * 2 open price
+   * 3 closing price
+   * 4 higer price
+   */
+  // const dataChart = [
+  //   ["Day", "", "", "", ""],
+  //   ["Mon", 20, 28, 38, 45],
+  //   ["Tue", 31, 38, 55, 66],
+  //   ["Wed", 50, 55, 77, 80],
+  //   ["Thu", 77, 77, 66, 50],
+  //   ["Fri", 68, 66, 22, 15],
+  // ];
 
   const optionsChart = {
     legend: "none",
