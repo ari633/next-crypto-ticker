@@ -20,6 +20,16 @@ export default function Page({ params }) {
       ).then((res) => res.json()),
   });
 
+  const lineQuery = useQuery({
+    queryKey: [`line_${symbol}`],
+    queryFn: () =>
+      fetch(
+        `https://testnet.binance.vision/api/v3/uiKlines?symbol=${symbol}&interval=5m`
+      ).then((res) => res.json()),
+  });
+
+  const lineData = lineQuery.data;
+
   const handleSubsribe = useCallback(
     (method) => {
       subscribe({
@@ -57,6 +67,10 @@ export default function Page({ params }) {
   useEffect(() => {
     setTicker(data);
   }, [data]);
+
+  useEffect(() => {
+    console.log(lineData);
+  }, [lineData]);
 
   const dataChart = [
     ["Day", "", "", "", ""],
